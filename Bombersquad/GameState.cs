@@ -11,6 +11,9 @@ namespace bombersquad_ai
         public readonly int EXPLOSION_RADIUS = GameConfig.explosionRadius; // config data
         private readonly double EXPLOSION_TACTICAL_WEIGHT = 1;
 
+        public int numWallsRegular = GameConfig.numWalls;
+        public int playerLives = GameConfig.playerLives;
+
 		private LocationData[,] map;
 
 		public LocationData[,] Map {
@@ -18,6 +21,9 @@ namespace bombersquad_ai
 		}
 		
 		private bool gameOver;
+        
+        public bool gameOverWin = false;
+        public bool gameOverLose = false;
 		
 		public bool GameOver {
 			get { return gameOver; }
@@ -85,6 +91,9 @@ namespace bombersquad_ai
 			}
 			
 			this.gameOver = false;
+            this.gameOverWin = false;
+            this.gameOverLose = false;
+            this.playerLives = GameConfig.playerLives;
 			this.aiState = new PlayerState[MAX_NUM_AI_BOMBERS];
 			this.numAIBombermen = 0;
 			this.bombermanSpawnPoints = new Coords[MAX_NUM_AI_BOMBERS + 1];
@@ -176,9 +185,18 @@ namespace bombersquad_ai
 		private void RespawnPlayers ()
 		{
 			if (this.playerState.Location == null) {
-				this.playerState.Location = this.bombermanSpawnPoints [0];
+                this.playerLives--;
+                if (this.playerLives == 0)
+                {
+                    this.gameOver = true;
+                    this.gameOverLose = true;
+                }
+                
+                this.playerState.Location = this.bombermanSpawnPoints[0];
 				LocationData datum = GetLocationData (this.playerState.Location);
 				datum.AddObject (this.playerState.PlayerObject);
+
+
 			}
 			
 			for (int i = 0; i < MAX_NUM_AI_BOMBERS; i++) {
@@ -367,6 +385,11 @@ namespace bombersquad_ai
 		{
 			LocationData datum = GetLocationData (coord);
 			datum.RemoveObject (LocationData.Tile.DESTRUCTIBLE_WALL);
+            this.numWallsRegular--;
+            if (this.numWallsRegular == 0)
+            {
+                this.gameOverWin = true;
+            }
 		}
 		
 		private void KillBombermen (Coords coord)
@@ -384,6 +407,14 @@ namespace bombersquad_ai
 				}
 				
 			}
+            /*
+            this.playerLives--;
+            if (this.playerLives == 0)
+            {
+                this.gameOver = true;
+                this.gameOverLose = true;
+            }
+             */
 		}
 		
 		private void ApplyAction (int x, int y, Action action, PlayerState state)

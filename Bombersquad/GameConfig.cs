@@ -28,8 +28,10 @@ namespace bombersquad_ai
         public static int playerStartY = 3;
 
         // GameState Data
-        public static int maxNumAIBombers = 4;              //number of AI players
+        public static int maxNumAIBombers = 4;              // Number of AI players
         public static int explosionRadius = 3;              // Radius for bomb explosions
+        public static int playerLives = 3;                  // Number of player lives 
+        public static int numWalls = 20;                     // Number of walls player has to blow up to win
         
         // AI Starting Positions
         // TODO: Randomize in bottom right corner

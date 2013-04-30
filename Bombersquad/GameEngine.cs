@@ -48,9 +48,12 @@ namespace bombersquad_ai
         Texture2D AISuper2Texture;
         Texture2D AISuper3Texture;
         Texture2D AISuper4Texture;
+        Texture2D gameOverWin;
+        Texture2D gameOverLose;
 
         // Player input
         KeyboardState keyboardState;
+        GamePadState gamePadState;
         DateTime lastUpdated;
 
         // Temporary variables
@@ -122,6 +125,8 @@ namespace bombersquad_ai
             AISuper2Texture = Content.Load<Texture2D>("super2bomberman_32x32");
             AISuper3Texture = Content.Load<Texture2D>("super3bomberman_32x32");
             AISuper4Texture = Content.Load<Texture2D>("super4bomberman_32x32");
+            gameOverWin = Content.Load<Texture2D>("gameover_win_640x640");
+            gameOverLose = Content.Load<Texture2D>("gameover_lose_640x640");
             
             // Initialize rectangles
             backgroundRect = new Rectangle(0, 0, GameConfig.graphicsWidth, GameConfig.graphicsHeight);
@@ -156,60 +161,66 @@ namespace bombersquad_ai
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            DateTime currentTime = DateTime.Now;
+            // Update game only if game isn't over
+            if (bomberSquadMainClass.game.getGameState().GameOver == false)
+            {
 
-            // Handle keyboard input
-            Action playerAction = null;
-            this.keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                playerAction = new Action(Action.ActionType.BOMB);
-                Console.WriteLine("> Key Pressed: SPACE");
-			}
-            else if (keyboardState.IsKeyDown(Keys.Up))
-            {
-				playerAction = new Action(Action.ActionType.NORTH);
-                Console.WriteLine("> Key Pressed: UP");
-			}
-            else if (keyboardState.IsKeyDown(Keys.Left))
-            {
-                playerAction = new Action(Action.ActionType.WEST);
-                Console.WriteLine("> Key Pressed: LEFT");
-            }
-            else if (keyboardState.IsKeyDown(Keys.Right))
-            {
-                playerAction = new Action(Action.ActionType.EAST);
-                Console.WriteLine("> Key Pressed: RIGHT");
-			}
-            else if (keyboardState.IsKeyDown(Keys.Down))
-            {
-                playerAction = new Action(Action.ActionType.SOUTH);
-                Console.WriteLine("> Key Pressed: DOWN");
-            }
+                DateTime currentTime = DateTime.Now;
 
-            if(currentTime - this.lastUpdated > new TimeSpan(0,0,0,0,150))
-            {
-                DateTime start = DateTime.Now;
-                Action[] botActions = bomberSquadMainClass.game.getAI().GetActions();
-                //Action[] botActions = new Action[4];
+                // Handle keyboard input
+                Action playerAction = null;
+                this.keyboardState = Keyboard.GetState();
+                if (keyboardState.IsKeyDown(Keys.Space) || GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed)
+                {
+                    playerAction = new Action(Action.ActionType.BOMB);
+                    Console.WriteLine("> Key Pressed: SPACE");
+                }
+                else if (keyboardState.IsKeyDown(Keys.Up) || GamePad.GetState(PlayerIndex.One).DPad.Up == ButtonState.Pressed)
+                {
+                    playerAction = new Action(Action.ActionType.NORTH);
+                    Console.WriteLine("> Key Pressed: UP");
+                }
+                else if (keyboardState.IsKeyDown(Keys.Left) || GamePad.GetState(PlayerIndex.One).DPad.Left == ButtonState.Pressed)
+                {
+                    playerAction = new Action(Action.ActionType.WEST);
+                    Console.WriteLine("> Key Pressed: LEFT");
+                }
+                else if (keyboardState.IsKeyDown(Keys.Right) || GamePad.GetState(PlayerIndex.One).DPad.Right == ButtonState.Pressed)
+                {
+                    playerAction = new Action(Action.ActionType.EAST);
+                    Console.WriteLine("> Key Pressed: RIGHT");
+                }
+                else if (keyboardState.IsKeyDown(Keys.Down) || GamePad.GetState(PlayerIndex.One).DPad.Down == ButtonState.Pressed)
+                {
+                    playerAction = new Action(Action.ActionType.SOUTH);
+                    Console.WriteLine("> Key Pressed: DOWN");
+                }
+
+                if (currentTime - this.lastUpdated > new TimeSpan(0, 0, 0, 0, 200))
+                {
+                    DateTime start = DateTime.Now;
+                    Action[] botActions = bomberSquadMainClass.game.getAI().GetActions();
+                    //Action[] botActions = new Action[4];
+                    DateTime end = DateTime.Now;
+                    Console.WriteLine("GetActions took " + (end - start));
+                    bomberSquadMainClass.game.getGameState().UpdateGame(playerAction, botActions);
+                    Console.WriteLine("> Completed one update cycle inside time-check condition.");
+                    this.lastUpdated = currentTime;
+                }
+
+                /*
                 DateTime end = DateTime.Now;
-                Console.WriteLine("GetActions took " + (end - start));
-                bomberSquadMainClass.game.getGameState().UpdateGame(playerAction, botActions);
-                Console.WriteLine("> Completed one update cycle inside time-check condition.");
-                this.lastUpdated = currentTime;
+                TimeSpan diff = end - begin;
+
+                if (diff < bomberSquadMainClass.game.getLoopTime()) {
+                    TimeSpan wait = bomberSquadMainClass.game.getLoopTime() - diff;
+                    //Thread.Sleep(wait);
+                }
+                */
+
+                base.Update(gameTime);
+
             }
-
-            /*
-            DateTime end = DateTime.Now;
-            TimeSpan diff = end - begin;
-
-            if (diff < bomberSquadMainClass.game.getLoopTime()) {
-                TimeSpan wait = bomberSquadMainClass.game.getLoopTime() - diff;
-                //Thread.Sleep(wait);
-            }
-            */
-
-            base.Update(gameTime);
         }
 
 
@@ -306,8 +317,20 @@ namespace bombersquad_ai
                     }
                 }
             }
-            
-            
+
+            // Draw game over text
+            if (bomberSquadMainClass.game.getGameState().GameOver == true)
+            {
+                if (bomberSquadMainClass.game.getGameState().gameOverWin == true)
+                {
+                    spriteBatch.Draw(gameOverWin, backgroundRect, Color.White);
+                }
+
+                if (bomberSquadMainClass.game.getGameState().gameOverLose == true)
+                {
+                    spriteBatch.Draw(gameOverLose, backgroundRect, Color.White);
+                }
+            }
 
             // --- END Draw Code
             spriteBatch.End();

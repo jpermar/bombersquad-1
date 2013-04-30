@@ -9,8 +9,11 @@ namespace bombersquad_ai
         // Alter all config data in GameConfig.cs
         int width = GameConfig.gameWidth;
         int height = GameConfig.gameHeight;
-        int numWallsRegular = 50;
+        int playerLives = GameConfig.playerLives;
+        int numWallsRegular = GameConfig.numWalls;
+
         int numWallsIndestructible = 0;
+        
         public Bombersquad game;
 
         private TimeSpan detonationTime;
@@ -211,31 +214,6 @@ namespace bombersquad_ai
         {
             Coords coords;
             Random rand = new Random();
-            /*
-            for (int i = 1; i < width - 1; i += 2)
-            {
-                for (int j = 1; j < height - 1; j += 2)
-                {
-                    coords = Coords.coordsXY(i, j, width, height);
-                    LocationData loc = GetGameState().GetLocationData(coords);
-                    if (loc.Objects.Count == 0)
-                    {
-                        Coords left = Coords.coordsXY(i - 1, j, width, height);
-                        Coords right = Coords.coordsXY(i + 1, j, width, height);
-                        Coords up = Coords.coordsXY(i, j - 1, width, height);
-                        Coords down = Coords.coordsXY(i - 1, j + 1, width, height);
-                        if (GetGameState().GetLocationData(left).Objects.Count == 0 || GetGameState().GetLocationData(right).Objects.Count == 0 || GetGameState().GetLocationData(up).Objects.Count == 0 || GetGameState().GetLocationData(down).Objects.Count == 0)
-                        {
-
-                            if (rand.Next(0, 101) < 55 && numWallsRegular <= 70)
-                            {
-                                initLocation(LocationData.Tile.DESTRUCTIBLE_WALL, coords);
-                                numWallsRegular++;
-                            }
-                        }
-                    }
-                }
-            }*/
 
             for (int count = 0; count < numWallsRegular;)
             {
