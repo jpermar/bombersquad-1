@@ -235,7 +235,7 @@ namespace bombersquad_ai
 
             for (int y = 0; y < GameConfig.gameHeight; y++)
             {
-                for (int x = 0; x < GameConfig.gameHeight; x++)
+                for (int x = 0; x < GameConfig.gameWidth; x++)
                 {
                     LocationData loc = this.bomberSquadMainClass.game.getGameState().GetLocationData(x, y);
                     if (loc != null)

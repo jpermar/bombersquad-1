@@ -52,6 +52,20 @@ namespace bombersquad_ai
 			coords = Coords.coordsXY (7, 3, width, height);
 			initLocation (LocationData.Tile.DESTRUCTIBLE_WALL, coords);
 
+            Random rand = new Random();
+
+            for (int i = 0; i < 50; i++)
+            {
+                coords = Coords.coordsXY(rand.Next(4, 17), rand.Next(4, 17), width, height);
+                initLocation(LocationData.Tile.DESTRUCTIBLE_WALL, coords);
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                coords = Coords.coordsXY(rand.Next(4, 17), rand.Next(4, 17), width, height);
+                initLocation(LocationData.Tile.INDESTRUCTIBLE_WALL, coords);
+            }
+
             coords = Coords.coordsXY(width - 9, height - 2, width, height);
             initLocation(LocationData.Tile.DESTRUCTIBLE_WALL, coords);
             coords = Coords.coordsXY(width - 9, height - 1, width, height);

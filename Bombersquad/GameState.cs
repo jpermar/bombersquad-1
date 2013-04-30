@@ -480,6 +480,31 @@ namespace bombersquad_ai
 							valid = false;
 							//Console.WriteLine ("not empty!");
 						}
+                        if (state != null)
+                        {
+                            // Player cannot walk through AI
+                            if (state.PlayerObject.Equals(LocationData.Tile.PLAYER))
+                            {
+                                if (datum.Equals(LocationData.Tile.AI_1)
+                                    || datum.Equals(LocationData.Tile.AI_2)
+                                    || datum.Equals(LocationData.Tile.AI_3)
+                                    || datum.Equals(LocationData.Tile.AI_4))
+                                {
+                                    valid = false;
+                                }
+                            }
+                            // AI cannot walk through player
+                            if (state.PlayerObject.Equals(LocationData.Tile.AI_1)
+                                    || state.PlayerObject.Equals(LocationData.Tile.AI_2)
+                                    || state.PlayerObject.Equals(LocationData.Tile.AI_3)
+                                    || state.PlayerObject.Equals(LocationData.Tile.AI_4))
+                            {
+                                if (datum.Equals(LocationData.Tile.PLAYER))
+                                {
+                                    valid = false;
+                                }
+                            }
+                        }
 					}
 					
 					//Console.WriteLine ("return valid " + valid);
