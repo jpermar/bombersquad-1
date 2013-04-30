@@ -6,9 +6,9 @@ namespace bombersquad_ai
 {
 	public class GameState
 	{
-		
-		public readonly int MAX_NUM_AI_BOMBERS = 4; //number of AI players
-		public readonly int EXPLOSION_RADIUS = 3;
+
+        public readonly int MAX_NUM_AI_BOMBERS = GameConfig.maxNumAIBombers; // config data
+        public readonly int EXPLOSION_RADIUS = GameConfig.explosionRadius; // config data
         private readonly double EXPLOSION_TACTICAL_WEIGHT = 1;
 
 		private LocationData[,] map;

@@ -26,6 +26,10 @@ namespace bombersquad_ai
         // Player Starting Position
         public static int playerStartX = 1;
         public static int playerStartY = 3;
+
+        // GameState Data
+        public static int maxNumAIBombers = 4;              //number of AI players
+        public static int explosionRadius = 3;              // Radius for bomb explosions
         
         // AI Starting Positions
         // TODO: Randomize in bottom right corner

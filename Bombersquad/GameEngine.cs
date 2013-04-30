@@ -84,7 +84,7 @@ namespace bombersquad_ai
             graphics.SynchronizeWithVerticalRetrace = false;
             
             // Call update once every 100 milliseconds
-            //this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 20.0f);
+            this.TargetElapsedTime = TimeSpan.FromSeconds(1.0f / 20.0f);
             
             gameTiles = new Rectangle[GameConfig.gameHeight, GameConfig.gameWidth];
 
@@ -122,7 +122,6 @@ namespace bombersquad_ai
             AISuper2Texture = Content.Load<Texture2D>("super2bomberman_32x32");
             AISuper3Texture = Content.Load<Texture2D>("super3bomberman_32x32");
             AISuper4Texture = Content.Load<Texture2D>("super4bomberman_32x32");
-            
             
             // Initialize rectangles
             backgroundRect = new Rectangle(0, 0, GameConfig.graphicsWidth, GameConfig.graphicsHeight);
@@ -162,7 +161,12 @@ namespace bombersquad_ai
             // Handle keyboard input
             Action playerAction = null;
             this.keyboardState = Keyboard.GetState();
-			if (keyboardState.IsKeyDown(Keys.Up))
+            if (keyboardState.IsKeyDown(Keys.Space))
+            {
+                playerAction = new Action(Action.ActionType.BOMB);
+                Console.WriteLine("> Key Pressed: SPACE");
+			}
+            else if (keyboardState.IsKeyDown(Keys.Up))
             {
 				playerAction = new Action(Action.ActionType.NORTH);
                 Console.WriteLine("> Key Pressed: UP");
@@ -182,11 +186,6 @@ namespace bombersquad_ai
                 playerAction = new Action(Action.ActionType.SOUTH);
                 Console.WriteLine("> Key Pressed: DOWN");
             }
-            else if (keyboardState.IsKeyDown(Keys.Space))
-            {
-                playerAction = new Action(Action.ActionType.BOMB);
-                Console.WriteLine("> Key Pressed: SPACE");
-			}
 
             if(currentTime - this.lastUpdated > new TimeSpan(0,0,0,0,150))
             {
