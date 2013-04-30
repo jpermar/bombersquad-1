@@ -4,36 +4,37 @@ using bombersquad_ai.astar;
 
 namespace bombersquad_ai
 {
-	class MainClass
-	{
+    class MainClass
+    {
         // Alter all config data in GameConfig.cs
         int width = GameConfig.gameWidth;
         int height = GameConfig.gameHeight;
-
+        int numWallsRegular = 50;
+        int numWallsIndestructible = 0;
         public Bombersquad game;
-        
+
         private TimeSpan detonationTime;
-		
+
         GameState gs;
-		
-		public MainClass ()
-		{
-			this.detonationTime = new TimeSpan (0, 0, 0, 5, 0);
-			this.gs = new GameState (width, height, this.detonationTime);
-		}
-				
-		GameState GetGameState ()
-		{
-			return this.gs;
-		}
-		
-		public void runOnce ()
-		{
-            
+
+        public MainClass()
+        {
+            this.detonationTime = new TimeSpan(0, 0, 0, 5, 0);
+            this.gs = new GameState(width, height, this.detonationTime);
+        }
+
+        GameState GetGameState()
+        {
+            return this.gs;
+        }
+
+        public void runOnce()
+        {
+            generateLevel();
             //MainClass go = new MainClass ();
-			
+
             // --- START temporary wall generation
-            Coords coords = Coords.coordsXY (3, 3, width, height);
+            /*Coords coords = Coords.coordsXY (3, 3, width, height);
 			initLocation (LocationData.Tile.INDESTRUCTIBLE_WALL, coords);
 			
 			coords = Coords.coordsXY (3, 4, width, height);
@@ -101,13 +102,165 @@ namespace bombersquad_ai
 			for (int i = 1; i < 10; i++) {
 				coords = Coords.coordsXY (width - i, height - 3, width, height);
 				initLocation (LocationData.Tile.DESTRUCTIBLE_WALL, coords);
-			}
-					
-			this.game = new Bombersquad (GetGameState ());
-			bool isBombPassable = false;
+			}*/
+
+            this.game = new Bombersquad(GetGameState());
+            bool isBombPassable = false;
             SquadAI ai = new SquadAI(GetGameState(), isBombPassable);
             this.game.SetAI(ai);
-		}
+        }
+
+        public void generateLevel()
+        {
+            placeUnbreakables();
+            placeBreakables();
+            placeAgents();
+        }
+
+        public void placeUnbreakables()
+        {
+            Random rand = new Random();
+            Coords coords;
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    if (i == 0 || i == width - 1 || j == 0 || j == height - 1)
+                    {
+                        coords = Coords.coordsXY(i, j, width, height);
+                        initLocation(LocationData.Tile.INDESTRUCTIBLE_WALL, coords);
+                    }
+                    else
+                    {
+
+                        if (rand.Next(0, 101) < 15 && numWallsIndestructible <= 30)
+                        {
+                            coords = Coords.coordsXY(i, j, width, height);
+                            initLocation(LocationData.Tile.INDESTRUCTIBLE_WALL, coords);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void placeAgents()
+        {
+            List<Coords> list = new List<Coords>();
+            for (int i = 2; i < width - 2; i++)
+            {
+                for (int j = 2; j < height - 2; j++)
+                {
+                    list.Add(Coords.coordsXY(i, j, width, height));
+                }
+            }
+            Random rand = new Random();
+            int k = rand.Next(0, list.Count);
+            Coords player = list[k];
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY(), width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY(), width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX(), player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX(), player.getY() + 1, width, height)).Objects.Clear();
+            initLocation(LocationData.Tile.PLAYER, player);
+            GetGameState().InitBomberman(LocationData.Tile.PLAYER, player);
+            k = rand.Next(0, list.Count);
+            player = list[k];
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY(), width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY(), width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX(), player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX(), player.getY() + 1, width, height)).Objects.Clear();
+            initLocation(LocationData.Tile.AI_1, player);
+            GetGameState().InitBomberman(LocationData.Tile.AI_1, player);
+            k = rand.Next(0, list.Count);
+            player = list[k];
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY(), width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY(), width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX(), player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX(), player.getY() + 1, width, height)).Objects.Clear();
+            initLocation(LocationData.Tile.AI_2, player);
+            GetGameState().InitBomberman(LocationData.Tile.AI_2, player);
+            k = rand.Next(0, list.Count);
+            player = list[k];
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY(), width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY(), width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX(), player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX(), player.getY() + 1, width, height)).Objects.Clear();
+            initLocation(LocationData.Tile.AI_3, player);
+            GetGameState().InitBomberman(LocationData.Tile.AI_3, player);
+            k = rand.Next(0, list.Count);
+            player = list[k];
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY(), width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY(), width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX() - 1, player.getY() + 1, width, height)).Objects.Clear();
+            list.Remove(Coords.coordsXY(player.getX(), player.getY() + 1, width, height));
+            GetGameState().GetLocationData(Coords.coordsXY(player.getX(), player.getY() + 1, width, height)).Objects.Clear();
+            initLocation(LocationData.Tile.AI_4, player);
+            GetGameState().InitBomberman(LocationData.Tile.AI_4, player);
+        }
+
+
+        public void placeBreakables()
+        {
+            Coords coords;
+            Random rand = new Random();
+            /*
+            for (int i = 1; i < width - 1; i += 2)
+            {
+                for (int j = 1; j < height - 1; j += 2)
+                {
+                    coords = Coords.coordsXY(i, j, width, height);
+                    LocationData loc = GetGameState().GetLocationData(coords);
+                    if (loc.Objects.Count == 0)
+                    {
+                        Coords left = Coords.coordsXY(i - 1, j, width, height);
+                        Coords right = Coords.coordsXY(i + 1, j, width, height);
+                        Coords up = Coords.coordsXY(i, j - 1, width, height);
+                        Coords down = Coords.coordsXY(i - 1, j + 1, width, height);
+                        if (GetGameState().GetLocationData(left).Objects.Count == 0 || GetGameState().GetLocationData(right).Objects.Count == 0 || GetGameState().GetLocationData(up).Objects.Count == 0 || GetGameState().GetLocationData(down).Objects.Count == 0)
+                        {
+
+                            if (rand.Next(0, 101) < 55 && numWallsRegular <= 70)
+                            {
+                                initLocation(LocationData.Tile.DESTRUCTIBLE_WALL, coords);
+                                numWallsRegular++;
+                            }
+                        }
+                    }
+                }
+            }*/
+
+            for (int count = 0; count < numWallsRegular;)
+            {
+                // Generate random coordinates
+                int randomX = rand.Next(1, this.width - 1);
+                int randomY = rand.Next(1, this.height - 1);
+                coords = Coords.coordsXY(randomX, randomY, this.width, this.height);
+                
+                // Get location data for coords
+                LocationData loc = GetGameState().GetLocationData(coords);
+
+                if (loc.Objects.Count == 0)
+                {
+                    Coords left = Coords.coordsXY(randomX - 1, randomY, width, height);
+                    Coords right = Coords.coordsXY(randomX + 1, randomY, width, height);
+                    Coords up = Coords.coordsXY(randomX, randomY - 1, width, height);
+                    Coords down = Coords.coordsXY(randomX - 1, randomY + 1, width, height);
+                    if (GetGameState().GetLocationData(left).Objects.Count == 0 || GetGameState().GetLocationData(right).Objects.Count == 0 || GetGameState().GetLocationData(up).Objects.Count == 0 || GetGameState().GetLocationData(down).Objects.Count == 0)
+                    {
+                        initLocation(LocationData.Tile.DESTRUCTIBLE_WALL, coords);
+                        count++;
+                    }
+                }
+            }
+        }
 
         public bool updateGame()
         {
@@ -119,14 +272,14 @@ namespace bombersquad_ai
         {
             this.game.drawGameConsole();
         }
-		
-		void initLocation (LocationData.Tile tile, Coords coords)
-		{
-			List<LocationData.Tile> objects = new List<LocationData.Tile> ();
-			objects.Add (tile);
-			LocationData datum = new LocationData (objects);
-			this.gs.SetLocationData (datum, coords);
-			
-		}
-	}
+
+        void initLocation(LocationData.Tile tile, Coords coords)
+        {
+            List<LocationData.Tile> objects = new List<LocationData.Tile>();
+            objects.Add(tile);
+            LocationData datum = new LocationData(objects);
+            this.gs.SetLocationData(datum, coords);
+
+        }
+    }
 }
